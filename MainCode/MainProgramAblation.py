@@ -37,9 +37,32 @@ class MainProgram:
         for i in range(f.shape[0]):  # 5次10cv
             for j in range(f.shape[1]):  # 7个算法
                 seven_res_f[j] += f[i][j]
-        print(seven_res_acc / self.times_cv)
-        print(seven_res_f / self.times_cv)
-        print('\n\n')
+
+        seven_acc_std = []
+        for i in range(3):
+            method = []
+            for j in range(7):
+                std = []
+                for k in range(5):
+                    std.append(acc[k][j][i])
+                method.append(np.std(std))
+            seven_acc_std.append(method)
+        seven_acc_std_all = np.array(seven_acc_std).T
+
+        seven_f_std = []
+        for i in range(3):
+            method = []
+            for j in range(7):
+                std = []
+                for k in range(5):
+                    std.append(f[k][j][i])
+                method.append(np.std(std))
+            seven_f_std.append(method)
+        seven_f_std_all = np.array(seven_f_std).T
+        print('--------------------------' + self.prop_can_ins)
+        print(seven_res_acc / self.times_cv, '\n\n', seven_acc_std_all)
+        print('\n\n', seven_res_f / self.times_cv, '\n\n', seven_f_std_all)
+        print('\n\n\n\n')
         # print(f)
 
     def __one_10cv(self, bag_set, bag_set_label):
@@ -114,7 +137,7 @@ class MainProgram:
 
 
 if __name__ == '__main__':
-    file_name = "D:/Data/data_zero/benchmark/tiger.mat"
+    file_name = "D:/Data/data_zero/benchmark/musk1.mat"
     print(file_name)
     for ratio in np.arange(0.1, 1.1, 0.1):
         MainProgram(file_name, ratio).CV()

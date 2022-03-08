@@ -40,13 +40,12 @@ class BagEmbedding:
         # Step 2: Iterate over each bag to get its embedding vector
         for i in range(self.num_tr_bag_set):
             train_embed_vectors.append(
-                self.__get_embed_vectors(self.train_bag_set[i, 0][:, :-1], pos_mean, neg_mean))
+                self.__get_embed_vectors(self.train_bag_set[i, 0][:, :-1]))
 
         if self.isAblation:
             tr_p, tr_n, tr_b, tr_pn, tr_pb, tr_nb, tr_pnb = [], [], [], [], [], [], []
             for i in range(self.num_tr_bag_set):
-                p, n, b, pn, pb, nb, pnb = self.__get_embed_vectors(self.train_bag_set[i, 0][:, :-1], pos_mean,
-                                                                    neg_mean)
+                p, n, b, pn, pb, nb, pnb = self.__get_embed_vectors(self.train_bag_set[i, 0][:, :-1])
                 tr_p.append(p)
                 tr_n.append(n)
                 tr_b.append(b)
