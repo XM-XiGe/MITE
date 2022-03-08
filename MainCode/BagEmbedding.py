@@ -7,7 +7,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.svm import SVC
 
-from MILFrame.MILTool import MILTool, normalize_vector
+from MILFrame.MILTool import normalize_vector
 from MainCode.RepInsSe import RepInsSe
 
 
@@ -27,7 +27,7 @@ class BagEmbedding:
         self.train_weight_vector = SVC(kernel='linear', max_iter=1000).fit(
             np.concatenate((self.pos_rep_ins_set, self.neg_rep_ins_set)),
             np.concatenate((self.pos_rep_ins_label, self.neg_rep_ins_label))).coef_[0]
-        self.pos_mean,self.neg_mean=self.__get_embed_vectors(self.train_bag_set)
+        self.pos_mean, self.neg_mean = self.__get_mean_vector(self.train_bag_set)
 
     def get_train_embed_vectors(self):
         """
@@ -35,7 +35,7 @@ class BagEmbedding:
         :return: The train embedding vectors.
         """
         # Step 1: Get the most positive (negative) representative instance corresponding to the train set.
-        pos_mean, neg_mean = self.__get_mean_vector(self.train_bag_set)
+        # pos_mean, neg_mean = self.__get_mean_vector(self.train_bag_set)
         train_embed_vectors = []
         # Step 2: Iterate over each bag to get its embedding vector
         for i in range(self.num_tr_bag_set):
@@ -69,14 +69,12 @@ class BagEmbedding:
         test_embed_vectors = []
         # Step 2: Iterate over each bag to get its embedding vector
         for i in range(self.num_te_bag_set):
-            test_embed_vectors.append(
-                self.__get_embed_vectors(self.test_bag_set[i, 0][:, :-1], pos_mean, neg_mean))
+            test_embed_vectors.append(self.__get_embed_vectors(self.test_bag_set[i, 0][:, :-1]))
         if self.isAblation:
             te_p, te_n, te_b, te_pn, te_pb, te_nb, te_pnb = [], [], [], [], [], [], []
 
             for i in range(self.num_te_bag_set):
-                p, n, b, pn, pb, nb, pnb = self.__get_embed_vectors(self.test_bag_set[i, 0][:, :-1], pos_mean,
-                                                                    neg_mean)
+                p, n, b, pn, pb, nb, pnb = self.__get_embed_vectors(self.test_bag_set[i, 0][:, :-1])
                 te_p.append(p)
                 te_n.append(n)
                 te_b.append(b)
@@ -89,7 +87,7 @@ class BagEmbedding:
 
         return np.array(test_embed_vectors)
 
-    def __get_embed_vectors(self, bag, pos_mean, neg_mean):
+    def __get_embed_vectors(self, bag):
         """
         Get the embedding vector for each bag
         :param bag: A single bag.
@@ -118,14 +116,14 @@ class BagEmbedding:
 
             if min_fun < max_fun:
                 if pos_ins_dis_max > neg_ins_dis_max:
-                    neg_pers_vector += bag[i] - neg_mean
+                    neg_pers_vector += bag[i] - self.neg_mean
                 else:
-                    pos_pers_vector += bag[i] - pos_mean
+                    pos_pers_vector += bag[i] - self.pos_mean
             else:
                 if pos_ins_dis_min > neg_ins_dis_min:
-                    neg_pers_vector += bag[i] - neg_mean
+                    neg_pers_vector += bag[i] - self.neg_mean
                 else:
-                    pos_pers_vector += bag[i] - pos_mean
+                    pos_pers_vector += bag[i] - self.pos_mean
 
         # Step 3: Get bag perspective vector.
         ins_score = []
@@ -184,12 +182,3 @@ class BagEmbedding:
         neg_mean = self.neg_rep_ins_set[index_ins_neg].mean(axis=0)
 
         return pos_mean, neg_mean
-
-
-if __name__ == '__main__':
-    file_path = "D:/Data/data_zero/benchmark/elephant.mat"
-    mil = MILTool(file_path)
-    bags = mil.bags
-
-    Demo = BagEmbedding(bags, bags, 0.2)
-    print(Demo.get_train_embed_vectors().shape)

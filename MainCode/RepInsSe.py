@@ -149,12 +149,3 @@ class RepInsSe:
         rep_ins = can_ins_set[ins_score.tolist().index(max(ins_score))]  # The representative instance.
 
         return rep_ins
-
-
-if __name__ == '__main__':
-    file_path = "D:/Data/data_zero/benchmark/tiger.mat"
-    mil = MILTool(file_path)
-    bags = mil.bags
-
-    Demo = RepInsSe(bags, 0.2)
-    print(Demo.get_rep_ins())

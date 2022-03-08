@@ -18,8 +18,6 @@ class MainProgram:
 
     def CV(self):
         MIL_model = MILTool(para_file_name=self.file_path)
-        # bag_set = MIL_model.bags
-        # bag_set_label = MIL_model.bags_label
         acc = []
         f = []
         for times in range(self.times_cv):
